@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="js/jquery-1.11.3.js"></script>
+    <script src="js/vue.js"></script>
+  <script src="js/axios.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <input type="text" name="uname" v-model="uname"><br>
+  <input type="password" name="upwd" v-model="upwd">
+    <button @click="login">登录</button>
+  </div>
+  
+    <script>
+
+var vm=new Vue({
+        el:"#app",
+        data:{
+          uname: "",
+          upwd: "",
+        },
+        methods:{
+          login(){
+            axios.post(
+            "http://127.0.0.1:5050/user/login",
+            `uname=${this.uname}&upwd=${this.upwd}`
+          ).then(result=>{
+            if(result.data==0){
+              alert('登录失败')
+            }else{
+              alert('登录成功')
+            }
+          })
+        }
+      }
+      })
+         /* $("button").click(function(){
+      var uname=$(":text").val();
+      var upwd=$(":password").val();
+        $.ajax({
+            url:"http://127.0.0.1:8080/user/login",
+            type:"post",
+            data:{ uname,upwd},
+            dataType:"json",
+            success:function(result){
+            console.log(result);
+            alert(result);
+            }
+        })
+      }) */
+    </script>
+</body>
+</html>
