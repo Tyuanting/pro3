@@ -11,7 +11,7 @@
       <a href="" yd-btn></a>
     </div>
 
-    <div class="list" v-if="this.info==[]">
+    <div class="list" v-if="this.info.length==0">
             <div class="notfound">未查询到{{this.$route.query.q}}的内容</div>
         </div>
         <div class="list" v-else>
@@ -29,7 +29,6 @@
           <p class="p-title">{{item.title}}</p>
           <p class="p-price">￥{{item.price}}
           <small class="sm">.00</small></p>
-          
         </div>
       </router-link>
     </div>
@@ -39,6 +38,16 @@
   </div>
 </template>
 <style scoped>
+.notfound{
+    margin: 0 auto;
+    padding-top: 100px;
+    text-align: center;
+}
+.list{
+    box-sizing: border-box;
+    padding: 10px;
+    width: 100%;
+}
 div{
   box-sizing: border-box;
 }

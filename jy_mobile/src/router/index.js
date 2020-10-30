@@ -7,6 +7,8 @@ import Me from '../views/Me'
 import Details from '../views/details'
 import Cart from '../views/Cart'
 import searchResult from '../views/searchResult.vue'
+import Login from '../views/login.vue'
+import Reg from '../views/reg.vue'
 // import { component } from 'vue/types/umd'
 
 Vue.use(VueRouter)
@@ -24,6 +26,14 @@ const routes = [
   {
     path: '/searchResult',
     component: searchResult
+  },
+  {
+    path: '/login',
+    component: Login
+  },
+  {
+    path: '/reg',
+    component: Reg
   },
   {
     path: '/cart',

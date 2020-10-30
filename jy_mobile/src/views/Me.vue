@@ -4,20 +4,30 @@
   <router-link to="/" slot="left">
     <mt-button icon="back"></mt-button>
   </router-link>
-  <router-link to="/" slot="right">
-  </router-link>
 </mt-header>
 <div class="user-index">
   <div class="index-top">
-    <div class="notlogged">
-      <a href="">
+
+    <div class="notlogged" v-if="this.$store.state.isLogined == 0">
+      <router-link to="/login">
         <div class="img-box">
           <div class="user-img">
             <img src="https://m.user.tcl.com/img/user-img.png" alt="">
           </div>
         </div>
         <p>登录/注册</p>
-      </a>
+      </router-link>
+    </div>
+
+    <div class="notlogged" v-else>
+      <router-link to="/login">
+        <div class="img-box">
+          <div class="user-img">
+            <img src="http://avatar.user.tcl.com/tcl_image1?imageView2/1/w/180/h/180/format/jpg/q/49|imageslim" alt="">
+          </div>
+        </div>
+        <p>{{this.$store.state.username}}</p>
+      </router-link>
     </div>
   </div>
   <div class="index-infor">
@@ -97,8 +107,8 @@
         </ul>
       </div>
     </div>
-    <div class="infor-box btn-con">
-			<button class="logOut">退出登录</button>
+    <div class="infor-box btn-con" v-show="this.$store.state.isLogined == 1">
+			<button class="logOut" @click="logOut">退出登录</button>
 		</div>
   </div>
 </div>
@@ -294,6 +304,19 @@ export default {
       }else if(value == 'mine'){
         this.tabbar == 'mine';
         this.$router.push('/me').catch(e=>{});
+      }
+    }
+  },
+  mounted() {
+    
+  },
+  methods: {
+    logOut() {
+      if (this.$store.state.isLogined == 1) {
+        this.$store.commit("setUser", "未登录");
+        this.$store.commit("logined", "0");
+        localStorage.setItem("isLogined", "0");
+        localStorage.setItem("username", "未登录");
       }
     }
   }
