@@ -98,7 +98,7 @@
       <div class="p-content">
         <div class="param-product">
           <div class="pic">
-            <img src="image/tv1.png" alt="">
+            <img :src="`../image/${details.pic}`" alt="">
           </div>
           <div class="p-info">
             <p class="p-title">{{details.title}}</p>
@@ -117,16 +117,16 @@
           <div class="choose-amount">
             <span class="txt">购买数量</span>
             <div class="item">
-              <button class="symbol-color-active">-</button>
-              <input type="number" class="number">
-              <button class="symbol-color">+</button>
+              <button class="symbol-color-active"  @click="red">-</button>
+              <input type="number" class="number" v-model="count">
+              <button class="symbol-color" @click="add">+</button>
             </div>
           </div>
         </div>
         <div class="spec-btn">
           <div class="btn">
             <button class="buy-ing">立即购买</button>
-            <button class="add-cart">加入购物车</button>
+            <button class="add-cart" @click="addToCart()">加入购物车</button>
           </div>
         </div>
         <div class="close" @click="offShow">×</div>
@@ -154,7 +154,7 @@
         </div>
         </div>
         <div class="footer-radius">
-          <div class="addToCart">加入购物车</div>
+          <div class="addToCart" @click="addToCart()">加入购物车</div>
           <div class="buy">立即购买</div>
         </div>
       </div>
@@ -608,22 +608,77 @@ content: "";
 }
 </style>
 <script>
+import {mapState,mapMutations,mapGetters} from 'vuex'
 export default {
   data(){
     return{
        isShow:false,
        pid:'',
-       details:[]
+       details:[],
+       count:'1',
+       isrepeat:0
     }
    
   },
+  computed:{
+        ...mapState([
+            'cart',//购物车列表
+            'proCount',//购物车某一蛋糕数量
+            'checkArray',//复选框存储数组
+            'checkAllstate'
+        ]),
+        ...mapGetters([
+            'priceall',//购物车总价格返回值
+        ])
+    },
   methods:{
+    // 添加购物车
+    addToCart(){
+      let obj = {
+        proId:this.details.pid,
+        proTitle:this.details.title,
+        proImg:this.details.pic,
+        proPrice:this.details.price,
+        count:this.count
+      }
+      this.isrepeat=0;//每次点击时 先把标识符归0
+      let a=this.cart;
+      if(a.length==0){
+                this.$store.commit('addcart',obj);
+                this.$store.commit('checkAll');
+            }else{
+                //循环验证是否已经存在此商品，若存在 只加数量 不添加新栏
+                for(let i=0;i<a.length;i++){
+                    if(obj.proTitle==a[i].title){
+                        this.addnumber(i);
+                        this.isrepeat=1;//然后把存在标识符变为1 让后续判断不再重新新建蛋糕
+                        break;//结束循环
+                    }
+                }
+                if(this.isrepeat!=1){//如果循环完毕都不重复 标识符为0 新建蛋糕
+                    this.$store.commit('addcart',obj);
+                    this.$store.commit('checkAll');
+                }
+            }
+            this.$toast({
+              message: '加入成功',
+              iconClass: 'iconfont icon-yanzhengchenggongValidation5'
+});
+    },
     Show(){
      this.isShow = true;
     //  console.log(111)
    },
     offShow(){
      this.isShow = false;
+   },
+   add(){
+     this.count++;
+   },
+   red(){
+     if(this.count>1){
+       this.count--;
+     }
    }
   },
   mounted(){

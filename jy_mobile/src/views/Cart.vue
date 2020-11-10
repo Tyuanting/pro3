@@ -15,7 +15,7 @@
 
   
     <!-- 无商品内容 -->
-    <div class="m-none">
+    <div class="m-none" v-if="this.cart.length==0">
       <div class="cart-contant-none">
         <div class="cart-contant-position">
           <div>
@@ -27,10 +27,10 @@
       </div>
     </div>
     <!-- 有商品内容 -->
-    <div>
+    <div v-else v-for="(item,index) of cart" :key="index">
       <div class="cart-list">
         <div class="cart-list-check">
-          <span :class="check" @click="listcheck"></span>
+          <span :class="`${checkArray[index] ? 'cart-list-check-block' : 'cart-list-check-none'}`" @click="listcheck(index)"></span>
         </div>
         <div class="cart-list-banner">
           <img
@@ -40,12 +40,18 @@
         </div>
         <div class="cart-list-content">
           <div class="cart-list-title">
-            <p>成都+峨眉山+乐山+都江堰6日5晚跟团游</p>
+            <p>{{item.proTitle}}</p>
           </div>
           <div class="cart-add">
-            <div class="cart-text">￥1977.3</div>
+            <div class="cart-text">￥{{item.proPrice}}</div>
             <div>
-              <my-cartadd></my-cartadd>
+              <div class="cartadd-style">
+                <div class="cartadd">
+                  <span @click="rednumber(index)">-</span>
+                  <input type="text" :value="`${proCount[index]}`" />
+                  <span @click="addnumber(index)">+</span>
+                </div>
+            </div>
             </div>
           </div>
         </div>
@@ -56,11 +62,11 @@
     <div class="arr-cart-countbg">
       <div class="add-cart-count">
         <div class="add-cart-all">
-          <span :class="allcheck" @click='alllistcheck'></span>
+          <span :class="`${checkAllstate ? 'cart-allcheck-block' : 'cart-allcheck-none'}`" @click='alllistcheck()'></span>
           全选
         </div>
         <div class="add-cart-total">
-          <p>总计：<span>￥100</span></p>
+          <p>总计：<span>￥{{priceall}}</span></p>
           <div>
             <span>未含运费</span>
           </div>
@@ -74,14 +80,27 @@
   </div>
 </template>
 <script>
+import {mapState,mapMutations,mapGetters} from 'vuex'
 export default {
   data() {
     return {
+       num: 1,
       menushow: "m-none",
       check: "cart-list-check-none",
       allcheck:'cart-allcheck-none'
     };
   },
+  computed:{
+        ...mapState([
+            'cart',//购物车列表
+            'proCount',//购物车某一蛋糕数量
+            'checkArray',//复选框存储数组
+            'checkAllstate'
+        ]),
+        ...mapGetters([
+            'priceall',//购物车总价格返回值
+        ])
+    },
   methods: {
     menu() {
       if (this.menushow == "m-none") {
@@ -90,21 +109,50 @@ export default {
         this.menushow = "m-none";
       }
     },
-    listcheck() {
-      if (this.check == "cart-list-check-none") {
-        this.check = "cart-list-check-block";
-      } else if (this.check == "cart-list-check-block") {
-        this.check = "cart-list-check-none";
-      }
+    listcheck(id) {
+      // if (this.check == "cart-list-check-none") {
+      //   this.check = "cart-list-check-block";
+      console.log(this.checkAllstate)
+        this.$store.commit('changecheck',id);
+          this.$store.commit('checkAll');
+      // } else if (this.check == "cart-list-check-block") {
+      //   this.check = "cart-list-check-none";
+      // }
     },
     alllistcheck(){
-      if (this.allcheck == "cart-allcheck-none") {
-        this.allcheck = "cart-allcheck-block";
-      } else if (this.allcheck == "cart-allcheck-block") {
-        this.allcheck = "cart-allcheck-none";
+      // if (this.allcheck == "cart-allcheck-none") {
+      //   this.allcheck = "cart-allcheck-block";
+        this.$store.commit('choseAll');
+        console.log(this.priceall)
+      // } else if (this.allcheck == "cart-allcheck-block") {
+      //   this.allcheck = "cart-allcheck-none";
+      // }
+    },
+    red() {
+      if (this.num > 1) {
+        this.num--;
+      } else if (this.num == 1) {
+        this.num = 1;
       }
-    }
+    },
+    //点击购物车某一栏蛋糕+号，数量增加
+        addnumber(id){
+            //提交蛋糕id到vuex，修改index下标蛋糕数量
+            // this.num++;
+            this.$store.commit('addnumber',id);
+            // this.$forceUpdate();//强制刷新
+        },
+        //点击购物车某一栏蛋糕-号，数量减
+        rednumber(id){
+            //提交蛋糕id到vuex，修改index下标蛋糕数量
+            // this.num++;
+            this.$store.commit('rednumber',id);
+            // this.$forceUpdate();//强制刷新
+        }
   },
+  mounted() {
+    
+  }
 };
 </script>
 <style scoped>
@@ -116,9 +164,31 @@ export default {
     width: 100%;
     top: 0;
 }
-.m-none {
-  display: none;
+.cartadd-style{
+  display: flex;
+  justify-content: flex-end;
 }
+.cartadd {
+  width: 65%;
+  border: 1px solid #eeeded;
+  display: flex;
+  text-align: center;
+  /* margin-left: 30%; */
+}
+.cartadd > span {
+  width: 35%;
+}
+.cartadd > input {
+  width: 60%;
+  text-align: center;
+  border: 0;
+  background-color: transparent;
+  border-left: 1px solid #eeeded;
+  border-right: 1px solid #eeeded;
+}
+/* .m-none {
+  display: none;
+} */
 .m-black {
   display: block;
 }
@@ -129,7 +199,7 @@ export default {
 }
 .cart-contant-position {
   position: absolute;
-  top: 50%;
+  top: 25%;
   left: 35%;
 }
 .cart-contant-position > div {
